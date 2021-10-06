@@ -1,0 +1,87 @@
+﻿@page
+@{
+    ViewData["Title"] = "Catalog";
+    @model IndexModel
+}
+<section class="esh-catalog-hero">
+    <div class="container">
+        <img class="esh-catalog-title" src="~/images/main_banner_text.png" />
+    </div>
+</section>
+
+<section class="esh-catalog-filters">
+    <div class="container">
+        <form method="get">
+            <label class="esh-catalog-label" data-title="brand">
+                <select asp-for="@Model.CatalogModel.BrandFilterApplied" asp-items="@Model.CatalogModel.Brands" class="esh-catalog-filter"></select>
+            </label>
+            <label class="esh-catalog-label" data-title="type">
+                <select asp-for="@Model.CatalogModel.TypesFilterApplied" asp-items="@Model.CatalogModel.Types" class="esh-catalog-filter"></select>
+            </label>
+            <input class="esh-catalog-send" type="image" src="~/images/arrow-right.svg" />
+        </form>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+<script src="~/js/signalr/dist/browser/signalr.min.js" asp-append-version="true"></script>
+
+<div class="container" id="app">
+
+    <div v-if="catalogItems.length > 0" class="esh-catalog-items row">
+        <div class="esh-catalog-item col-md-4" v-for="catalog in catalogItems">
+
+            <form asp-page="/Basket/Index" method="post">
+                <img class="esh-catalog-thumbnail" v-bind:src="catalog.pictureUri" />
+                <input class="esh-catalog-button" type="submit" value="[ ADD TO BASKET ]" />
+                <div class="esh-catalog-name">
+                    <span>{{catalog.name}}e</span>
+                </div>
+                <div class="esh-catalog-price">
+                    <span>{{catalog.price}}</span>
+                </div>
+                <input type="hidden" v-model="catalog.id" name="id" />
+                <input type="hidden" v-model="catalog.name" name="name" />
+                <input type="hidden" v-model="catalog.pictureUri" name="pictureUri" />
+                <input type="hidden" v-model="catalog.price" name="price" />
+            </form>
+
+        </div>
+    </div>
+    <partial name="_pagination" for="CatalogModel.PaginationInfo" />
+</div>
+<script>
+    var connection = new signalR.HubConnectionBuilder().withUrl("/NotifyHub").build();
+    connection.start().then(function () {
+       let app = new Vue({
+        el: '#app',
+        data: {
+            catalogItems:[]
+        }, mounted: function () {
+            let catalogItems = '@Html.Raw(Json.Serialize(Model.CatalogModel.CatalogItems))';
+            this.catalogItems = JSON.parse(catalogItems);
+           }, methods: {
+            sendButton: function() {
+                  
+                   var user = "1111"
+                   var message = "33333"
+                   connection.invoke("SendMessage", user, message).catch(function (err) {
+                       return console.error(err.toString());
+                   });
+            }
+           }
+       })
+
+        connection.on("OnCataItemPriceChanged", function (items) {
+            debugger;
+            app.catalogItems = items
+        })
+    }).catch(function (err) {
+        return console.error(err.toString());
+    });
+
+   
+
+    
+   
+</script>
