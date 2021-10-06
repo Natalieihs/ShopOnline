@@ -60,28 +60,14 @@
         }, mounted: function () {
             let catalogItems = '@Html.Raw(Json.Serialize(Model.CatalogModel.CatalogItems))';
             this.catalogItems = JSON.parse(catalogItems);
-           }, methods: {
-            sendButton: function() {
-                  
-                   var user = "1111"
-                   var message = "33333"
-                   connection.invoke("SendMessage", user, message).catch(function (err) {
-                       return console.error(err.toString());
-                   });
-            }
            }
        })
 
         connection.on("OnCataItemPriceChanged", function (items) {
-            debugger;
             app.catalogItems = items
         })
     }).catch(function (err) {
         return console.error(err.toString());
     });
-
-   
-
-    
    
 </script>

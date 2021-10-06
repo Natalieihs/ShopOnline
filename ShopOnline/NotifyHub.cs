@@ -7,7 +7,7 @@ using Web.Services;
 
 namespace Web
 {
-    public class NotifyHub: Hub
+    public class NotifyHub : Hub
     {
         private readonly RandomCatalogPriceService _catalogPriceService;
         public NotifyHub(RandomCatalogPriceService catalogPriceService)
@@ -17,7 +17,6 @@ namespace Web
         }
         public override Task OnConnectedAsync()
         {
-            Console.WriteLine("连接建立好");
             return base.OnConnectedAsync();
         }
 
